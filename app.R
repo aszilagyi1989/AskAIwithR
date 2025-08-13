@@ -19,7 +19,7 @@ ui <- page_navbar(
   theme = bs_theme(bootswatch = "minty"),
   window_title = "Ask AI with R",
   nav_panel("Chat", 
-            textInput(inputId = "key", label = "Set your OpenAI API key:", value = "", width = 1000, placeholder = "If you don' have one, then you can create here: https://platform.openai.com/api-keys"), # Sys.getenv("OPENAI_KEY")
+            textInput(inputId = "key", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_KEY"), width = 1000, placeholder = "If you don' have one, then you can create here: https://platform.openai.com/api-keys"),
             selectInput("package", "Choose one R Package:", c("askgpt", "TheOpenAIR"), selected = "askgpt"),
             textAreaInput(inputId = "question", label = "Write here your question:", value = "", width = 1000, height = 200),
             actionButton("ask", "Answer me!"),
@@ -40,6 +40,12 @@ server <- function(input, output, session) {
     
   })
   
+  output$key <- renderPrint({
+    
+    key <- get(input$key)
+    
+  })
+  
   output$answer <- renderText({
     
     data
@@ -56,22 +62,22 @@ server <- function(input, output, session) {
       
       tryCatch({
       
-        login(input$key)
-        instructions <- askgpt(input$question, return_answer = TRUE)
+        login(api_key = input$key)
+        instructions <- askgpt(prompt = input$question, return_answer = TRUE)
         instructions <- capture.output(cat(instructions))
         output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
       
       },
       error = function(error_message){
-        
+
         showModal(modalDialog(
           title = "Error!",
           "Please, set your correct OpenAI API key, which you can create here: https://platform.openai.com/api-keys",
           footer = modalButton("Ok"),
           fade = TRUE
         ))
-        
-        
+
+
       })
       
     }else if (input$package == "TheOpenAIR"){
