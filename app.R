@@ -13,6 +13,7 @@ library("bslib")
 library("shinyjs")
 library("askgpt")
 library("TheOpenAIR")
+library("chatAI4R")
 
 ui <- page_navbar(
   title = "Ask AI with R",
@@ -20,11 +21,11 @@ ui <- page_navbar(
   window_title = "Ask AI with R",
   nav_panel("Chat", 
             textInput(inputId = "key", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_KEY"), width = 1000, placeholder = "If you don' have one, then you can create here: https://platform.openai.com/api-keys"),
-            selectInput("package", "Choose one R Package:", c("askgpt", "TheOpenAIR"), selected = "askgpt"),
+            selectInput("package", "Choose one R Package:", c("TheOpenAIR", "chatAI4R"), selected = "TheOpenAIR"), # "askgpt", 
             textAreaInput(inputId = "question", label = "Write here your question:", value = "", width = 1000, height = 200),
             actionButton("ask", "Answer me!"),
-            verbatimTextOutput("answer") #,
-            # downloadButton("downloadData", "Download")
+            verbatimTextOutput("answer"),
+            downloadButton("downloadData", "Download")
   )
   
 )
@@ -32,7 +33,7 @@ ui <- page_navbar(
 
 server <- function(input, output, session) {
   
-  data <- data.frame()
+  data <- reactiveVal()
   
   output$package <- renderPrint({
     
@@ -43,12 +44,6 @@ server <- function(input, output, session) {
   output$key <- renderPrint({
     
     key <- get(input$key)
-    
-  })
-  
-  output$answer <- renderText({
-    
-    data
     
   })
   
@@ -66,19 +61,19 @@ server <- function(input, output, session) {
         instructions <- askgpt(prompt = input$question, return_answer = TRUE)
         instructions <- capture.output(cat(instructions))
         output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
+        data(data.frame(input$question, instructions))
+        isolate(data())
       
-      },
-      error = function(error_message){
+       },
+       error = function(error_message){
+           showModal(modalDialog(
+             title = "Error!",
+             as.character(error_message),
+             footer = modalButton("Ok"),
+             fade = TRUE
+           ))
 
-        showModal(modalDialog(
-          title = "Error!",
-          "Please, set your correct OpenAI API key, which you can create here: https://platform.openai.com/api-keys",
-          footer = modalButton("Ok"),
-          fade = TRUE
-        ))
-
-
-      })
+       })
       
     }else if (input$package == "TheOpenAIR"){
       
@@ -88,13 +83,37 @@ server <- function(input, output, session) {
         instructions <- chat(input$question, output = "message")
         instructions <- capture.output(cat(instructions))
         output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
+        data(data.frame(input$question, instructions))
+        isolate(data())
         
       },
       error = function(error_message){
         
         showModal(modalDialog(
           title = "Error!",
-          "Please, set your correct OpenAI API key, which you can create here: https://platform.openai.com/api-keys",
+          as.character(error_message),
+          footer = modalButton("Ok"),
+          fade = TRUE
+        ))
+        
+      })
+      
+    }else if (input$package == "chatAI4R"){
+      
+      tryCatch({
+        
+        instructions <- chat4R(input$question, temperature = 0, simple = TRUE, api_key = input$key)
+        instructions <- capture.output(cat(instructions$content))
+        output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
+        data(data.frame(input$question, instructions))
+        isolate(data())
+        
+      },
+      error = function(error_message){
+        
+        showModal(modalDialog(
+          title = "Error!",
+          as.character(error_message),
           footer = modalButton("Ok"),
           fade = TRUE
         ))
@@ -108,15 +127,18 @@ server <- function(input, output, session) {
   
   output$downloadData <- downloadHandler(
     
-    # makeReactiveBinding("Data"),
-    
     filename = function() {
+      
       paste("data-", Sys.time(), ".csv", sep = "")
+      
     },
+    
     content = function(file) {
-      print(input$answer)
-      write.csv(input$answer, file)
+
+      write.table(data(), file, row.names = FALSE, col.names = FALSE, quote = FALSE, sep = ";")
+      
     }
+    
   )
   
 }
