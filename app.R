@@ -14,6 +14,7 @@ library("shinyjs")
 library("askgpt")
 library("TheOpenAIR")
 library("chatAI4R")
+library("gptr")
 
 ui <- page_navbar(
   title = "Ask AI with R",
@@ -21,7 +22,7 @@ ui <- page_navbar(
   window_title = "Ask AI with R",
   nav_panel("Chat", 
             textInput(inputId = "key", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_KEY"), width = 1000, placeholder = "If you don't have one, then you can create here: https://platform.openai.com/api-keys"),
-            selectInput("package", "Choose one R Package:", c("TheOpenAIR", "chatAI4R", "askgpt"), selected = "TheOpenAIR"), 
+            selectInput("package", "Choose one R Package:", c("TheOpenAIR", "chatAI4R", "gptr", "askgpt"), selected = "TheOpenAIR"), 
             textAreaInput(inputId = "question", label = "Write here your question:", value = "", width = 1000, height = 200),
             actionButton("ask", "Answer me!"),
             verbatimTextOutput("answer"),
@@ -112,6 +113,32 @@ server <- function(input, output, session) {
         
         instructions <- chat4R(input$question, temperature = 0, simple = TRUE, api_key = input$key)
         instructions <- capture.output(cat(instructions$content))
+        output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
+        
+        if(length(data()) == 0)
+          data(data.frame(input$package, input$question, instructions))
+        else
+          data(rbind(data(), data.frame(input$package, input$question, instructions)))
+        isolate(data())
+        
+      },
+      error = function(error_message){
+        
+        showModal(modalDialog(
+          title = "Error!",
+          as.character(error_message),
+          footer = modalButton("Ok"),
+          fade = TRUE
+        ))
+        
+      })
+      
+    }else if (input$package == "gptr"){
+      
+      tryCatch({
+        
+        instructions <- get_response(input$question, api_key = input$key, print_response = FALSE)
+        instructions <- capture.output(cat(instructions[["choices"]][["message"]]$content))
         output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
         
         if(length(data()) == 0)
