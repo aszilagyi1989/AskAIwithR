@@ -21,7 +21,7 @@ ui <- page_navbar(
   window_title = "Ask AI with R",
   nav_panel("Chat", 
             textInput(inputId = "key", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_KEY"), width = 1000, placeholder = "If you don't have one, then you can create here: https://platform.openai.com/api-keys"),
-            selectInput("package", "Choose one R Package:", c("TheOpenAIR", "chatAI4R"), selected = "TheOpenAIR"), # "askgpt", 
+            selectInput("package", "Choose one R Package:", c("TheOpenAIR", "chatAI4R", "askgpt"), selected = "TheOpenAIR"), 
             textAreaInput(inputId = "question", label = "Write here your question:", value = "", width = 1000, height = 200),
             actionButton("ask", "Answer me!"),
             verbatimTextOutput("answer"),
@@ -63,9 +63,9 @@ server <- function(input, output, session) {
         output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
         
         if(length(data()) == 0)
-          data(data.frame(input$question, instructions))
+          data(data.frame(input$package, input$question, instructions))
         else
-          data(rbind(data(), data.frame(input$question, instructions)))
+          data(rbind(data(), data.frame(input$package, input$question, instructions)))
         isolate(data())
       
        },
@@ -89,9 +89,9 @@ server <- function(input, output, session) {
         output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
 
         if(length(data()) == 0)
-          data(data.frame(input$question, instructions))
+          data(data.frame(input$package, input$question, instructions))
         else
-          data(rbind(data(), data.frame(input$question, instructions)))
+          data(rbind(data(), data.frame(input$package, input$question, instructions)))
         isolate(data())
         
       },
@@ -115,9 +115,9 @@ server <- function(input, output, session) {
         output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
         
         if(length(data()) == 0)
-          data(data.frame(input$question, instructions))
+          data(data.frame(input$package, input$question, instructions))
         else
-          data(rbind(data(), data.frame(input$question, instructions)))
+          data(rbind(data(), data.frame(input$package, input$question, instructions)))
         isolate(data())
         
       },
