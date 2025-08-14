@@ -20,7 +20,7 @@ ui <- page_navbar(
   theme = bs_theme(bootswatch = "minty"),
   window_title = "Ask AI with R",
   nav_panel("Chat", 
-            textInput(inputId = "key", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_KEY"), width = 1000, placeholder = "If you don' have one, then you can create here: https://platform.openai.com/api-keys"),
+            textInput(inputId = "key", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_KEY"), width = 1000, placeholder = "If you don't have one, then you can create here: https://platform.openai.com/api-keys"),
             selectInput("package", "Choose one R Package:", c("TheOpenAIR", "chatAI4R"), selected = "TheOpenAIR"), # "askgpt", 
             textAreaInput(inputId = "question", label = "Write here your question:", value = "", width = 1000, height = 200),
             actionButton("ask", "Answer me!"),
@@ -61,7 +61,11 @@ server <- function(input, output, session) {
         instructions <- askgpt(prompt = input$question, return_answer = TRUE)
         instructions <- capture.output(cat(instructions))
         output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
-        data(data.frame(input$question, instructions))
+        
+        if(length(data()) == 0)
+          data(data.frame(input$question, instructions))
+        else
+          data(rbind(data(), data.frame(input$question, instructions)))
         isolate(data())
       
        },
@@ -83,7 +87,11 @@ server <- function(input, output, session) {
         instructions <- chat(input$question, output = "message")
         instructions <- capture.output(cat(instructions))
         output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
-        data(data.frame(input$question, instructions))
+
+        if(length(data()) == 0)
+          data(data.frame(input$question, instructions))
+        else
+          data(rbind(data(), data.frame(input$question, instructions)))
         isolate(data())
         
       },
@@ -105,7 +113,11 @@ server <- function(input, output, session) {
         instructions <- chat4R(input$question, temperature = 0, simple = TRUE, api_key = input$key)
         instructions <- capture.output(cat(instructions$content))
         output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
-        data(data.frame(input$question, instructions))
+        
+        if(length(data()) == 0)
+          data(data.frame(input$question, instructions))
+        else
+          data(rbind(data(), data.frame(input$question, instructions)))
         isolate(data())
         
       },
