@@ -15,18 +15,28 @@ library("askgpt")
 library("TheOpenAIR")
 library("chatAI4R")
 library("gptr")
+library("openai")
+library("stringr")
 
 ui <- page_navbar(
   title = "Ask AI with R",
   theme = bs_theme(bootswatch = "minty"),
   window_title = "Ask AI with R",
   nav_panel("Chat", 
-            textInput(inputId = "key", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_KEY"), width = 1000, placeholder = "If you don't have one, then you can create here: https://platform.openai.com/api-keys"),
+            passwordInput(inputId = "key", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_KEY"), width = 1000, placeholder = "If you don't have one, then you can create here: https://platform.openai.com/api-keys"),
             selectInput("package", "Choose one R Package:", c("TheOpenAIR", "chatAI4R", "gptr", "askgpt"), selected = "TheOpenAIR"), 
             textAreaInput(inputId = "question", label = "Write here your question:", value = "", width = 1000, height = 200),
             actionButton("ask", "Answer me!"),
             verbatimTextOutput("answer"),
             downloadButton("downloadData", "Download")
+  ),
+  nav_panel("Image", 
+            passwordInput(inputId = "key2", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_KEY"), width = 1000, placeholder = "If you don't have one, then you can create here: https://platform.openai.com/api-keys"),
+            selectInput("size", "Choose size of the picture:", c("256x256", "512x512", "1024x1024"), selected = "256x256"), 
+            textAreaInput(inputId = "depict", label = "What should the picture depict?", value = "", width = 1000, height = 200),
+            actionButton("draw", "Draw me!"),
+            imageOutput("image"),
+            # downloadButton("downloadImage", "Download")
   )
   
 )
@@ -179,6 +189,45 @@ server <- function(input, output, session) {
     }
     
   )
+  
+  
+  observeEvent(input$draw, {
+    
+    req(input$key2)
+    req(input$size)
+    req(input$depict)
+    
+    tryCatch({
+        
+      output$image <- renderImage({ 
+        
+        img_dim <- str_split(input$size, "x", n = 1)
+        
+        url <- create_image(
+                prompt = input$depict,
+                n = 1,
+                size = input$size, 
+                openai_api_key = input$key2
+              )[["data"]][1, ] 
+
+        download.file(url, "filename", mode = "wb")
+        list(src = "filename", contentType = "image/png", alt = input$depict, 
+             width = img_dim, height = img_dim
+             )
+        
+        }, deleteFile = FALSE)
+        
+      },
+      error = function(error_message){
+        showModal(modalDialog(
+          title = "Error!",
+          as.character(error_message),
+          footer = modalButton("Ok"),
+          fade = TRUE
+        ))
+        
+      })
+  })
   
 }
 
