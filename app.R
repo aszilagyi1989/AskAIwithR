@@ -22,21 +22,27 @@ ui <- page_navbar(
   title = "Ask AI with R",
   theme = bs_theme(bootswatch = "minty"),
   window_title = "Ask AI with R",
-  nav_panel("Chat", 
-            passwordInput(inputId = "key", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_KEY"), width = 1000, placeholder = "If you don't have one, then you can create here: https://platform.openai.com/api-keys"),
-            selectInput("package", "Choose one R Package:", c("TheOpenAIR", "chatAI4R", "gptr", "askgpt"), selected = "TheOpenAIR"), 
-            textAreaInput(inputId = "question", label = "Write here your question:", value = "", width = 1000, height = 200),
-            actionButton("ask", "Answer me!"),
-            verbatimTextOutput("answer"),
-            downloadButton("downloadData", "Download")
-  ),
-  nav_panel("Image", 
-            passwordInput(inputId = "key2", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_KEY"), width = 1000, placeholder = "If you don't have one, then you can create here: https://platform.openai.com/api-keys"),
-            selectInput("size", "Choose size of the picture:", c("256x256", "512x512", "1024x1024"), selected = "256x256"), 
-            textAreaInput(inputId = "depict", label = "What should the picture depict?", value = "", width = 1000, height = 200),
-            actionButton("draw", "Draw me!"),
-            imageOutput("image"),
-            # downloadButton("downloadImage", "Download")
+  navset_card_underline(id = "navset", 
+                        
+    nav_panel("Chat", 
+              passwordInput(inputId = "key", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_API_KEY"), width = 1000, placeholder = "If you don't have one, then you can create here: https://platform.openai.com/api-keys"),
+              selectInput("package", "Choose one R Package:", c("TheOpenAIR", "chatAI4R", "gptr", "askgpt"), selected = "TheOpenAIR"), 
+              textAreaInput(inputId = "question", label = "Write here your question:", value = "", width = 1000, height = 200),
+              actionButton("ask", "Answer me!"),
+              verbatimTextOutput("answer"),
+              downloadButton("downloadData", "Download")
+    ),
+    nav_panel("Image", 
+              passwordInput(inputId = "key2", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_API_KEY"), width = 1000, placeholder = "If you don't have one, then you can create here: https://platform.openai.com/api-keys"),
+              selectInput("size", "Choose size of the picture:", c("256x256", "512x512", "1024x1024"), selected = "256x256"), 
+              textAreaInput(inputId = "depict", label = "What should the picture depict?", value = "", width = 1000, height = 100),
+              actionButton("draw", "Draw me!"),
+              imageOutput("image"),
+    ),
+    nav_panel("Gallery", 
+              uiOutput("images"),
+    )
+    
   )
   
 )
@@ -206,27 +212,66 @@ server <- function(input, output, session) {
         url <- create_image(
                 prompt = input$depict,
                 n = 1,
-                size = input$size, 
+                size = input$size,
                 openai_api_key = input$key2
-              )[["data"]][1, ] 
+              )[["data"]][1, ]
 
-        download.file(url, "filename", mode = "wb")
-        list(src = "filename", contentType = "image/png", alt = input$depict, 
+        filename <- paste("image-", str_replace_all(str_sub(Sys.time(), 1, 19), ":", ""), ".png", sep = "")
+        download.file(url, filename, mode = "wb")
+        
+        list(src = filename, contentType = "image/png", alt = filename, 
              width = img_dim, height = img_dim
-             )
+        )
         
-        }, deleteFile = FALSE)
+      }, deleteFile = FALSE)
         
-      },
-      error = function(error_message){
-        showModal(modalDialog(
-          title = "Error!",
-          as.character(error_message),
-          footer = modalButton("Ok"),
-          fade = TRUE
-        ))
+    },
+    error = function(error_message){
+      showModal(modalDialog(
+        title = "Error!",
+        as.character(error_message),
+        footer = modalButton("Ok"),
+        fade = TRUE
+      ))
+        
+    })
+    
+  })
+  
+  
+  observeEvent(input$navset, {
+    
+    if(input$navset == "Gallery") {
+      
+      output$images <- renderUI({ 
+        
+        tryCatch({
+          
+          image_files <- list.files(path = ".", pattern = ".png", all.files = FALSE, full.names = TRUE)
+          lapply(image_files, 
+                 function(path) {
+                   
+                   renderImage({
+                     list(src = path, alt = path)
+                   }, deleteFile = FALSE)
+                   
+                 }
+          )
+        },
+        error = function(error_message){
+          showModal(modalDialog(
+            title = "Error!",
+            as.character(error_message),
+            footer = modalButton("Ok"),
+            fade = TRUE
+          ))
+          
+        })
         
       })
+      
+    }
+    
   })
   
 }
