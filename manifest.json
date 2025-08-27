@@ -1878,7 +1878,7 @@
         "Package": "reticulate",
         "Type": "Package",
         "Title": "Interface to 'Python'",
-        "Version": "1.42.0",
+        "Version": "1.43.0",
         "Authors@R": "c(\n  person(\"Tomasz\", \"Kalinowski\", role = c(\"ctb\", \"cre\"),\n         email = \"tomasz@posit.co\"),\n  person(\"Kevin\", \"Ushey\", role = c(\"aut\"),\n         email = \"kevin@posit.co\"),\n  person(\"JJ\", \"Allaire\", role = c(\"aut\"), email = \"jj@posit.co\"),\n  person(\"RStudio\", role = c(\"cph\", \"fnd\")),\n  person(\"Yuan\", \"Tang\", role = c(\"aut\", \"cph\"),\n         email = \"terrytangyuan@gmail.com\",\n         comment = c(ORCID = \"0000-0001-5243-233X\")),\n  person(\"Dirk\", \"Eddelbuettel\", role = c(\"ctb\", \"cph\"),\n         email = \"edd@debian.org\"),\n  person(\"Bryan\", \"Lewis\", role = c(\"ctb\", \"cph\"),\n         email = \"blewis@illposed.net\"),\n  person(\"Sigrid\", \"Keydana\", role = c(\"ctb\"),\n         email = \"sigrid@posit.co\"),\n  person(\"Ryan\", \"Hafen\", role = c(\"ctb\", \"cph\"),\n         email = \"rhafen@gmail.com\"),\n  person(\"Marcus\", \"Geelnard\", role = c(\"ctb\", \"cph\"),\n         comment = \"TinyThread library, http://tinythreadpp.bitsnbites.eu/\")\n  )",
         "Description": "Interface to 'Python' modules, classes, and functions. When calling\n    into 'Python', R data types are automatically converted to their equivalent 'Python'\n    types. When values are returned from 'Python' to R they are converted back to R\n    types. Compatible with all versions of 'Python' >= 2.7.",
         "License": "Apache License 2.0",
@@ -1894,12 +1894,12 @@
         "VignetteBuilder": "knitr",
         "Config/build/compilation-database": "true",
         "NeedsCompilation": "yes",
-        "Packaged": "2025-03-25 17:06:29 UTC; tomasz",
-        "Author": "Tomasz Kalinowski [ctb, cre],\n  Kevin Ushey [aut],\n  JJ Allaire [aut],\n  RStudio [cph, fnd],\n  Yuan Tang [aut, cph] (<https://orcid.org/0000-0001-5243-233X>),\n  Dirk Eddelbuettel [ctb, cph],\n  Bryan Lewis [ctb, cph],\n  Sigrid Keydana [ctb],\n  Ryan Hafen [ctb, cph],\n  Marcus Geelnard [ctb, cph] (TinyThread library,\n    http://tinythreadpp.bitsnbites.eu/)",
+        "Packaged": "2025-07-21 15:35:43 UTC; tomasz",
+        "Author": "Tomasz Kalinowski [ctb, cre],\n  Kevin Ushey [aut],\n  JJ Allaire [aut],\n  RStudio [cph, fnd],\n  Yuan Tang [aut, cph] (ORCID: <https://orcid.org/0000-0001-5243-233X>),\n  Dirk Eddelbuettel [ctb, cph],\n  Bryan Lewis [ctb, cph],\n  Sigrid Keydana [ctb],\n  Ryan Hafen [ctb, cph],\n  Marcus Geelnard [ctb, cph] (TinyThread library,\n    http://tinythreadpp.bitsnbites.eu/)",
         "Maintainer": "Tomasz Kalinowski <tomasz@posit.co>",
         "Repository": "CRAN",
-        "Date/Publication": "2025-03-25 20:40:01 UTC",
-        "Built": "R 4.3.3; x86_64-w64-mingw32; 2025-04-07 01:06:27 UTC; windows",
+        "Date/Publication": "2025-07-21 16:50:02 UTC",
+        "Built": "R 4.3.3; x86_64-w64-mingw32; 2025-08-27 12:24:51 UTC; windows",
         "Archs": "x64"
       }
     },
@@ -2130,6 +2130,32 @@
         "Repository": "CRAN",
         "Date/Publication": "2025-02-21 12:30:02 UTC",
         "Built": "R 4.3.3; ; 2025-04-07 02:34:24 UTC; windows"
+      }
+    },
+    "shinycssloaders": {
+      "Source": "CRAN",
+      "Repository": "http://cran.rstudio.com",
+      "description": {
+        "Package": "shinycssloaders",
+        "Title": "Add Loading Animations to a 'shiny' Output While It's\nRecalculating",
+        "Version": "1.1.0",
+        "Authors@R": "c(\n    person(\"Dean\",\"Attali\",email=\"daattali@gmail.com\",role=c(\"aut\",\"cre\"),\n        comment = c(\"Maintainer/developer of shinycssloaders since 2019\", ORCID=\"0000-0002-5645-3493\")),\n    person(\"Andras\",\"Sali\",email=\"andras.sali@alphacruncher.hu\",role=c(\"aut\"),comment=\"Original creator of shinycssloaders package\"),\n    person(\"Luke\",\"Hass\",role=c(\"ctb\",\"cph\"),comment=\"Author of included CSS loader code\")\n    )",
+        "Description": "When a 'Shiny' output (such as a plot, table, map, etc.) is recalculating, it remains \n    visible but gets greyed out. Using 'shinycssloaders', you can add a loading animation (\"spinner\")\n    to outputs instead. By wrapping a 'Shiny' output in 'withSpinner()', a spinner will automatically\n    appear while the output is recalculating. You can also manually show and hide the spinner, or add\n    a full-page spinner to cover the entire page.\n    See the demo online at <https://daattali.com/shiny/shinycssloaders-demo/>.",
+        "License": "MIT + file LICENSE",
+        "URL": "https://github.com/daattali/shinycssloaders,\nhttps://daattali.com/shiny/shinycssloaders-demo/",
+        "BugReports": "https://github.com/daattali/shinycssloaders/issues",
+        "Depends": "R (>= 3.1)",
+        "Imports": "digest, glue, grDevices, htmltools (>= 0.3.5), shiny",
+        "Suggests": "knitr, shinydisconnect, shinyjs",
+        "RoxygenNote": "7.2.3",
+        "Encoding": "UTF-8",
+        "NeedsCompilation": "no",
+        "Packaged": "2024-07-30 18:52:48 UTC; Dean",
+        "Author": "Dean Attali [aut, cre] (Maintainer/developer of shinycssloaders since\n    2019, <https://orcid.org/0000-0002-5645-3493>),\n  Andras Sali [aut] (Original creator of shinycssloaders package),\n  Luke Hass [ctb, cph] (Author of included CSS loader code)",
+        "Maintainer": "Dean Attali <daattali@gmail.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2024-07-30 22:30:02 UTC",
+        "Built": "R 4.3.3; ; 2025-04-07 02:34:22 UTC; windows"
       }
     },
     "shinyjs": {
@@ -2485,16 +2511,85 @@
   },
   "files": {
     ".RData": {
-      "checksum": "b99f17499a4ca77e2bef1db0c2a5f9f0"
+      "checksum": "8518b4143759b0140c8360dc8d62d944"
     },
     "app.R": {
-      "checksum": "b9e1e9818ef54705341d91b1f59ea596"
+      "checksum": "e651c79a5a40934a635468e43610ee80"
     },
     "filename": {
       "checksum": "c7a41bbf664284d8854fc7f929e695dc"
     },
+    "image-2025-08-26 095454.png": {
+      "checksum": "4aabe3cd31389c62b8f59512a5e509b8"
+    },
+    "image-2025-08-26 104408.png": {
+      "checksum": "8ff7287182342e414cfd602b45f3920f"
+    },
+    "image-2025-08-26 104852.png": {
+      "checksum": "3545a829dcc4cde06111d31545b8554a"
+    },
+    "image-2025-08-26 111110.png": {
+      "checksum": "582992187ced1096ab528ac3f6109626"
+    },
+    "image-2025-08-26 111358.png": {
+      "checksum": "cfeccf01cbe9a44454f6c77a4efe527e"
+    },
+    "image-2025-08-26 113303.png": {
+      "checksum": "4a9bb5fb984f7fa8256466f3345a88fb"
+    },
+    "image-2025-08-26 113320.png": {
+      "checksum": "87aac987c4d5f212ac3a5593e6568ea5"
+    },
+    "image-2025-08-27 092234.png": {
+      "checksum": "ff5d9963ba3ff78d4292b8eeb1153584"
+    },
+    "image-2025-08-27 092601.png": {
+      "checksum": "93628212c2bb17520c9f12461900ca51"
+    },
+    "image-2025-08-27 092631.png": {
+      "checksum": "aee74a9269f9c6197e9f70ed1359eacf"
+    },
+    "image-2025-08-27 092654.png": {
+      "checksum": "fb24b9a56148782adb0388d943f19e95"
+    },
+    "image-2025-08-27 140933.png": {
+      "checksum": "f16f639c7115a17e94ee6cb876eb3332"
+    },
+    "image-2025-08-27 140957.png": {
+      "checksum": "c00c2b122141f1c15d1d10556334f081"
+    },
+    "Images/image-2025-08-26 095454.png": {
+      "checksum": "4aabe3cd31389c62b8f59512a5e509b8"
+    },
+    "Images/image-2025-08-26 095658.png": {
+      "checksum": "b65549de51c591c895827809382de1f9"
+    },
+    "Images/image-2025-08-26 100016.png": {
+      "checksum": "52f554b3d1cda9b26b7447188ef25d6c"
+    },
+    "Images/image-2025-08-26 101748.png": {
+      "checksum": "2ec384200a0e7115bf2fcf37c0e5e745"
+    },
+    "Images/image-2025-08-26 101843.png": {
+      "checksum": "3df10e0f72db80a2b1d2e0e63226d77e"
+    },
+    "Images/image-2025-08-26 103055.png": {
+      "checksum": "7d4053098611a3f02a82e550ac9783d1"
+    },
+    "Images/image-2025-08-26 103116.png": {
+      "checksum": "63292b4459d2bbff751ca914ca485f18"
+    },
+    "Images/image-2025-08-26 103245.png": {
+      "checksum": "d6d275cbf0a603b9186fac97ac5e2d71"
+    },
+    "Images/letöltés (1).png": {
+      "checksum": "16d550c11ec6973166faae90b9a2aace"
+    },
+    "Images/letöltés.png": {
+      "checksum": "44117b63a31bb9aac1a2cb79419606a9"
+    },
     "requirements.txt": {
-      "checksum": "cf3a907a2c195a7a7826bb1561d416a7"
+      "checksum": "d85f62308d340e6d8aff603cedc18cb2"
     }
   },
   "users": null
