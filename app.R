@@ -9,6 +9,7 @@
 
 library("shiny")
 library("shinyWidgets")
+library("shinycssloaders")
 library("bslib")
 library("shinyjs")
 library("askgpt")
@@ -30,7 +31,7 @@ ui <- page_navbar(
               selectInput("model", "Choose AI Model:", c("gpt-4o-mini", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-5-mini", "gpt-5"), selected = "gpt-4o-mini"), # "gpt-3.5-turbo", 
               textAreaInput(inputId = "question", label = "Write here your question:", value = "", width = 1000, height = 200),
               actionButton("ask", "Answer me!"),
-              verbatimTextOutput("answer"),
+              verbatimTextOutput("answer") %>% withSpinner(),
               downloadButton("downloadData", "Download")
     ),
     nav_panel("Image", 
@@ -38,10 +39,10 @@ ui <- page_navbar(
               selectInput("size", "Choose size of the picture:", c("256x256", "512x512", "1024x1024"), selected = "256x256"), 
               textAreaInput(inputId = "depict", label = "What should the picture depict?", value = "", width = 1000, height = 100),
               actionButton("draw", "Draw me!"),
-              imageOutput("image"),
+              imageOutput("image") %>% withSpinner(),
     ),
     nav_panel("Gallery", 
-              uiOutput("images"),
+              uiOutput("images") %>% withSpinner(),
     )
     
   )
