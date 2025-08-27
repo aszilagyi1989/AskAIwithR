@@ -26,7 +26,8 @@ ui <- page_navbar(
                         
     nav_panel("Chat", 
               passwordInput(inputId = "key", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_API_KEY"), width = 1000, placeholder = "If you don't have one, then you can create here: https://platform.openai.com/api-keys"),
-              selectInput("package", "Choose one R Package:", c("TheOpenAIR", "chatAI4R", "gptr", "askgpt"), selected = "TheOpenAIR"), 
+              selectInput("package", "Choose R Package:", c("TheOpenAIR", "chatAI4R", "gptr", "askgpt"), selected = "TheOpenAIR"), 
+              selectInput("model", "Choose AI Model:", c("gpt-4o-mini", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-5-mini", "gpt-5"), selected = "gpt-4o-mini"), # "gpt-3.5-turbo", 
               textAreaInput(inputId = "question", label = "Write here your question:", value = "", width = 1000, height = 200),
               actionButton("ask", "Answer me!"),
               verbatimTextOutput("answer"),
@@ -64,6 +65,12 @@ server <- function(input, output, session) {
     
   })
   
+  output$model <- renderPrint({
+    
+    model <- get(input$model)
+    
+  })
+  
   
   observeEvent(input$ask, {
     
@@ -75,7 +82,7 @@ server <- function(input, output, session) {
       tryCatch({
       
         login(api_key = input$key)
-        instructions <- askgpt(prompt = input$question, return_answer = TRUE)
+        instructions <- askgpt(prompt = input$question, return_answer = TRUE, model = input$model)
         instructions <- capture.output(cat(instructions))
         output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
         
@@ -101,7 +108,7 @@ server <- function(input, output, session) {
       tryCatch({
         
         openai_api_key(input$key)
-        instructions <- chat(input$question, output = "message")
+        instructions <- chat(input$question, output = "message", model = input$model)
         instructions <- capture.output(cat(instructions))
         output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
 
@@ -127,7 +134,7 @@ server <- function(input, output, session) {
       
       tryCatch({
         
-        instructions <- chat4R(input$question, temperature = 0, simple = TRUE, api_key = input$key)
+        instructions <- chat4R(input$question, temperature = 0, simple = TRUE, api_key = input$key, Model = input$model)
         instructions <- capture.output(cat(instructions$content))
         output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
         
@@ -153,7 +160,7 @@ server <- function(input, output, session) {
       
       tryCatch({
         
-        instructions <- get_response(input$question, api_key = input$key, print_response = FALSE)
+        instructions <- get_response(input$question, api_key = input$key, print_response = FALSE, model = input$model)
         instructions <- capture.output(cat(instructions[["choices"]][["message"]]$content))
         output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
         
