@@ -200,7 +200,6 @@ server <- function(input, output, session) {
   observeEvent(input$draw, {
     
     req(input$key2)
-    req(input$size)
     req(input$depict)
     
     tryCatch({
@@ -223,7 +222,7 @@ server <- function(input, output, session) {
              width = img_dim, height = img_dim
         )
         
-      }, deleteFile = FALSE)
+      }, deleteFile = FALSE) %>% bindEvent(input$draw)
         
     },
     error = function(error_message){
@@ -236,7 +235,7 @@ server <- function(input, output, session) {
         
     })
     
-  })
+  }) 
   
   
   observeEvent(input$navset, {
