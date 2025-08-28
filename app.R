@@ -27,22 +27,22 @@ ui <- page_navbar(
                         
     nav_panel("Chat", 
               passwordInput(inputId = "key", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_API_KEY"), width = 1000, placeholder = "If you don't have one, then you can create here: https://platform.openai.com/api-keys"),
-              selectInput("package", "Choose R Package:", c("TheOpenAIR", "chatAI4R", "gptr", "askgpt"), selected = "TheOpenAIR"), 
-              selectInput("model", "Choose AI Model:", c("gpt-4o-mini", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-5-mini", "gpt-5"), selected = "gpt-4o-mini"), # "gpt-3.5-turbo", 
+              selectInput("package", "Choose R Package:", c("gptr", "chatAI4R", "TheOpenAIR"), selected = "gptr"), # , "askgpt"
+              selectInput("model", "Choose AI Model:", c("gpt-4o-mini", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-5-mini", "gpt-5"), selected = "gpt-5"), # "gpt-3.5-turbo", 
               textAreaInput(inputId = "question", label = "Write here your question:", value = "", width = 1000, height = 200),
               actionButton("ask", "Answer me!"),
-              verbatimTextOutput("answer") %>% withSpinner(),
-              downloadButton("downloadData", "Download")
+              verbatimTextOutput("answer"), 
+              downloadButton("downloadData", "Download"),
     ),
     nav_panel("Image", 
               passwordInput(inputId = "key2", label = "Set your OpenAI API key:", value = Sys.getenv("OPENAI_API_KEY"), width = 1000, placeholder = "If you don't have one, then you can create here: https://platform.openai.com/api-keys"),
               selectInput("size", "Choose size of the picture:", c("256x256", "512x512", "1024x1024"), selected = "256x256"), 
               textAreaInput(inputId = "depict", label = "What should the picture depict?", value = "", width = 1000, height = 100),
               actionButton("draw", "Draw me!"),
-              imageOutput("image") %>% withSpinner(),
+              imageOutput("image"), 
     ),
     nav_panel("Gallery", 
-              uiOutput("images") %>% withSpinner(),
+              uiOutput("images") %>% withSpinner()
     )
     
   )
@@ -78,6 +78,7 @@ server <- function(input, output, session) {
     req(input$key)
     req(input$question)
     
+    showPageSpinner()
     if (input$package == "askgpt"){
       
       tryCatch({
@@ -163,7 +164,7 @@ server <- function(input, output, session) {
         
         instructions <- get_response(input$question, api_key = input$key, print_response = FALSE, model = input$model)
         instructions <- capture.output(cat(instructions[["choices"]][["message"]]$content))
-        output$answer <- renderPrint({ writeLines(noquote(paste(instructions, sep = "\n")))  })
+        output$answer <- renderPrint({writeLines(noquote(paste(instructions, sep = "\n")))  })
         
         if(length(data()) == 0)
           data(data.frame(input$package, input$question, instructions))
@@ -184,6 +185,8 @@ server <- function(input, output, session) {
       })
       
     }
+    
+    hidePageSpinner()
     
   })
   
@@ -206,16 +209,17 @@ server <- function(input, output, session) {
   
   
   observeEvent(input$draw, {
-    
+
     req(input$key2)
     req(input$depict)
-    
+    showPageSpinner()
+
     tryCatch({
-        
-      output$image <- renderImage({ 
-        
+
+      output$image <- renderImage({
+
         img_dim <- str_split(input$size, "x", n = 1)
-        
+
         url <- create_image(
                 prompt = input$depict,
                 n = 1,
@@ -225,13 +229,13 @@ server <- function(input, output, session) {
 
         filename <- paste("image-", str_replace_all(str_sub(Sys.time(), 1, 19), ":", ""), ".png", sep = "")
         download.file(url, filename, mode = "wb")
-        
-        list(src = filename, contentType = "image/png", alt = filename, 
+
+        list(src = filename, contentType = "image/png", alt = filename,
              width = img_dim, height = img_dim
         )
-        
+
       }, deleteFile = FALSE) %>% bindEvent(input$draw)
-        
+
     },
     error = function(error_message){
       showModal(modalDialog(
@@ -240,10 +244,12 @@ server <- function(input, output, session) {
         footer = modalButton("Ok"),
         fade = TRUE
       ))
-        
+
     })
-    
-  }) 
+
+    hidePageSpinner()
+
+  })
   
   
   observeEvent(input$navset, {
